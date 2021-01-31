@@ -19,49 +19,61 @@ import { async } from 'regenerator-runtime';
 // https://forkify-api.herokuapp.com/v2
 //////////////////////////////////////////////////////
 
+// Control recipe function
 const controlRecipes = async function () {
   try {
+    // Getting ID from
     const id = window.location.hash.slice(1);
-
     if (!id) return;
 
+    // Render spinner
     recipeView.renderSpinner();
 
+    // Update search results
     resultsView.update(model.getSearchResultsPage());
 
+    // Update bookmarks view
     bookmarksView.update(model.state.bookmarks);
 
-    // 1. Loading recipe
+    // Loading recipe
     await model.loadRecipe(id);
 
-    // 2. Rendering recipe
+    // Rendering recipe
     recipeView.render(model.state.recipe);
   } catch (err) {
     recipeView.renderError();
   }
 };
 
+// Control search results function
 const controlSearchResults = async function () {
   try {
+    // Render spinner
     resultsView.renderSpinner();
 
     // Get search query
     const query = searchView.getQuery();
-    if (!query) return;
+    if (!query) {
+      resultsView.renderError(
+        'Search input is empty! Please start by searching for a recipe or an ingredient'
+      );
+      return;
+    }
 
-    // Load search
+    // Load search results
     await model.loadSearchResults(query);
 
-    // Render results
+    // Render results from array of recipes according page
     resultsView.render(model.getSearchResultsPage());
 
     // Render initial pagination buttons
     paginationView.render(model.state.search);
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };
 
+// Control pagination
 const controlPagination = async function (goToPage) {
   try {
     // Render NEW results
@@ -133,6 +145,7 @@ const controlAddRecipe = async function (newRecipe) {
 };
 
 const init = function () {
+  console.log('Updated 31.01.2021');
   bookmarksView.addHandlerRender(controlBookmarks);
   recipeView.addHandlerRender(controlRecipes);
   recipeView.addHandlerUpdateServings(controlServings);

@@ -34,6 +34,8 @@ class PaginationView extends View {
     const numPages = Math.ceil(
       this._data.results.length / this._data.resultsPerPage
     );
+
+    // Markups for buttons
     const next = this._generateMarkupButtons(currentPage, 'next');
     const prev = this._generateMarkupButtons(currentPage, 'prev');
 

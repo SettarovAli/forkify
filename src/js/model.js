@@ -3,6 +3,7 @@ import { KEY, API_URL, RES_PER_PAGE } from './config.js';
 
 import { AJAX } from './helpers.js';
 
+// General current data
 export const state = {
   recipe: {},
   search: {
@@ -14,6 +15,7 @@ export const state = {
   bookmarks: [],
 };
 
+// Create object for recipe
 const createRecipeObject = function (data) {
   const { recipe } = data.data;
   return {
@@ -29,29 +31,36 @@ const createRecipeObject = function (data) {
   };
 };
 
+// Load recipe
 export const loadRecipe = async function (id) {
   try {
+    // Getting data from API
     const data = await AJAX(`${API_URL}${id}?key=${KEY}`);
 
+    // Passing current recipe data
     state.recipe = createRecipeObject(data);
 
+    // Check if current recipe was bookmarked
     if (state.bookmarks.some(bookmark => bookmark.id === id)) {
       state.recipe.bookmarked = true;
     } else {
       state.recipe.bookmarked = false;
     }
   } catch (err) {
-    console.error(`🎁 ${err}`);
     throw err;
   }
 };
 
+// Load search results
 export const loadSearchResults = async function (query) {
   try {
+    // Passing search query to the state data
     state.search.query = query;
 
+    // Getting data from request to the API
     const data = await AJAX(`${API_URL}?search=${query}&key=${KEY}`);
 
+    // Creating array of objects according search query
     state.search.results = data.data.recipes.map(rec => {
       return {
         id: rec.id,
@@ -61,10 +70,10 @@ export const loadSearchResults = async function (query) {
         ...(rec.key && { key: rec.key }),
       };
     });
-    console.log(state.search.results);
+
+    // Changing current page of search result to the first
     state.search.page = 1;
   } catch (err) {
-    console.error(`🎁 ${err}`);
     throw err;
   }
 };
